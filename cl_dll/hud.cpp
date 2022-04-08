@@ -31,6 +31,9 @@
 #include "demo_api.h"
 #include "vgui_ScorePanel.h"
 
+
+// MODIFIED BY LiTHiuM
+#include <math.h>
 hud_player_info_t	 g_PlayerInfoList[MAX_PLAYERS+1];	   // player info from the engine
 extra_player_info_t  g_PlayerExtraInfo[MAX_PLAYERS+1];   // additional player info sent directly to the client dll
 
@@ -325,8 +328,10 @@ void CHud :: Init( void )
 
 	m_iLogo = 0;
 	m_iFOV = 0;
-
-	CVAR_CREATE( "zoom_sensitivity_ratio", "1.2", 0 );
+	// MODIFIED BY LiTHiuM
+	// CVAR_CREATE( "zoom_sensitivity_ratio", "1.2", 0 );
+	CVAR_CREATE( "zoom_sensitivity_ratio", "1", 0 );
+	
 	default_fov = CVAR_CREATE( "default_fov", "90", 0 );
 	m_pCvarStealMouse = CVAR_CREATE( "hud_capturemouse", "1", FCVAR_ARCHIVE );
 	m_pCvarDraw = CVAR_CREATE( "hud_draw", "1", FCVAR_ARCHIVE );
@@ -648,12 +653,15 @@ int CHud::MsgFunc_SetFOV(const char *pszName,  int iSize, void *pbuf)
 	if ( m_iFOV == def_fov )
 	{  
 		// reset to saved sensitivity
+		// TOOD: SHOULD THIS BE sensitivity->value ??
 		m_flMouseSensitivity = 0;
 	}
 	else
-	{  
+	{  	
+		// MODIFIED BY LiTHiuM
 		// set a new sensitivity that is proportional to the change from the FOV default
-		m_flMouseSensitivity = sensitivity->value * ((float)newfov / (float)def_fov) * CVAR_GET_FLOAT("zoom_sensitivity_ratio");
+		// m_flMouseSensitivity = sensitivity->value * ((float)newfov / (float)def_fov) * CVAR_GET_FLOAT("zoom_sensitivity_ratio");
+		m_flMouseSensitivity = sensitivity->value / pow(((float)def_fov / (float)newfov), CVAR_GET_FLOAT("zoom_sensitivity_ratio"));
 	}
 
 	return 1;
